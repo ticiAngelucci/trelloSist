@@ -1,13 +1,23 @@
-<?php
-include 'components/header.php';
-?>
-<div class="jumbotron">
-  <h1 class="display-4">Hello, world!</h1>
-  <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-  <hr class="my-4">
-  <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-  <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+<?php include 'components/header.php'; ?>
+<br>
+<center>
+<img src="assets/logoTelo.png" alt="logoTelo" width="228px">
+    <div class="container mt-5">
+    <h2>Inicio de Sesión</h2>
+
+    <form action="functions/verificador.php" method="POST">
+        <div class="form-group">
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" class="form-control" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" class="form-control" name="password" required>
+        </div>
+        
+        <button type="submit" name="ingresar" class="btn btn-primary">Submit</button>
+    </form>
 </div>
-<?php
-include 'components/footer.php';
-?>
+
+
+<?php include 'components/footer.php';?>

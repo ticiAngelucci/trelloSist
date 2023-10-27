@@ -9,11 +9,11 @@ if(!empty($_POST["ingresar"])) {
         $username=$_POST["username"];
         $password=$_POST["password"];
         $sql=$conn->query("select * from usuarios where username='$username' and password='$password' ");
-        header("location:inicio.php");
+        header("location:index.html");
         /* if(!isset($_SESSION['username'])){
             if ($datos=$sql->fetch_object()) {
                 $_SESSION['username'] = $username;
-                header("location:inicio.php");
+                header("location:index.html");
             } else {
                 echo "ACCESO DENEGADO";
             }

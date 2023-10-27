@@ -130,7 +130,7 @@ function listBoards() {
 
 function renderBoard(board) {
     appData.currentBoard = appData.boards.indexOf(board);
-    document.title = 'Kards | ' + currentBoard().name;
+    document.title = 'MyNote® | ' + currentBoard().name;
     e_title.innerText = currentBoard().name;
     //e_title.addEventListener('click'), allow editing board name
     // To-Do: set theme
@@ -209,8 +209,8 @@ function addBoard() {
     /* Adds a new board based on the input in the sidebar. */
 
     let _boardTitle = e_addBoardText.value;
-    if (!_boardTitle) return createAlert("Type a name for the board!");  // We don't create a board if it has no name.
-    if (appData.boards.length >= 512) return createAlert("Max limit for boards reached.")  // or if there are already too many boards
+    if (!_boardTitle) return createAlert("Escribe un nombre para el escritorio!");  // We don't create a board if it has no name.
+    if (appData.boards.length >= 512) return createAlert("Limite de escritorios excedido")  // or if there are already too many boards
     e_addBoardText.value = '';
 
     let _newBoard = new Board(_boardTitle, uniqueID(), {'theme': null});
@@ -332,7 +332,7 @@ class Card {
             _newItemDeleteButton.ariaHidden = true;
             _newItemDeleteButton.classList.add('fa', 'fa-trash');
             _newItemDeleteButton.addEventListener('click', () => {
-                createConfirmDialog("Are you sure to delete this task?", () => this.removeItem(_item));
+                createConfirmDialog("Quieres borrar esta tarea?", () => this.removeItem(_item));
             });
 
             // Add both the buttons to the span tag.
@@ -411,7 +411,7 @@ class Card {
         _newInput.maxLength = 256;
         _newInput.type = 'text';
         _newInput.name = "add-todo-text";
-        _newInput.placeholder = "Add Task...";
+        _newInput.placeholder = "Añadir tarea...";
         _newInput.addEventListener('keyup', (e) => {
             if (e.code === "Enter") _newButton.click();
         });
@@ -423,7 +423,7 @@ class Card {
         _newButton.innerText = '+';
         _newButton.addEventListener('click', () => {
             let _inputValue = _newInput.value;
-            if (!_inputValue) return createAlert("Type a name for the item!");
+            if (!_inputValue) return createAlert("Escribe algo antes de guardar!");
             let _item = new Item(_inputValue, null, getBoardFromId(this.parentBoardId).uniqueID(), this.id);
             this.addItem(_item);
             _newInput.value = '';
@@ -473,7 +473,7 @@ class Board {
         e_addCardText.value = '';
     
         // If the user pressed the button without typing any name, we'll default to "Untitled Card {cards length +1}"
-        if (!_cardTitle) _cardTitle = `Untitled Card ${this.cards.length + 1}`;
+        if (!_cardTitle) _cardTitle = `Tabla sin titulo ${this.cards.length + 1}`;
     
         let _card = new Card(_cardTitle, this.uniqueID(), this.id);
         this.cards.push(_card);
@@ -676,7 +676,7 @@ const cardContextMenu_hide = (e) => {
 };
 
 const cardContextMenu_clearCard = () => {
-    createConfirmDialog('Are you sure to clear this board', () => {
+    createConfirmDialog('Quieres vaciar esta tabla?', () => {
         let _currentCardObject = getCardFromElement(cardContextMenu_currentCard);
 
         _currentCardObject.items.length = 0;
@@ -685,7 +685,7 @@ const cardContextMenu_clearCard = () => {
 };
 
 const cardContextMenu_deleteCard = () => {
-    createConfirmDialog('Are you sure to delete this card', () => {
+    createConfirmDialog('Deseas borrar esta tabla?', () => {
         let _currentCardObject = getCardFromElement(cardContextMenu_currentCard);
 
         // Remove the card from the cards list based on its index position.
@@ -759,7 +759,7 @@ function loadData() {
         renderBoard(appData.boards[appData.currentBoard]);
     } else {
         appData.currentBoard = 0;
-        let _defaultBoard = new Board("Untitled Board", 'b0', {'theme': null});
+        let _defaultBoard = new Board("Escritorio sin titulo", 'b0', {'theme': null});
         appData.boards.push(_defaultBoard);
     }
     listBoards();
@@ -794,10 +794,10 @@ e_autoSaveButton.addEventListener('change',  function (event) {
     }
 })
 //e_saveButton.addEventListener('click', saveData);
-e_saveButton.addEventListener('click', () => {saveData(); createAlert("Data successfully saved.")});
+e_saveButton.addEventListener('click', () => {saveData(); createAlert("Datos guardados exitosamente")});
 
 e_deleteButton.addEventListener('click', () => {
-    createConfirmDialog('Are you sure to delete this board?', () => {
+    createConfirmDialog('Deseas borrar este escritorio?', () => {
         let _boardName = currentBoard().name;
 
         // Delete the current board.
@@ -807,7 +807,7 @@ e_deleteButton.addEventListener('click', () => {
         }
 
         if (appData.boards.length === 0) {
-            let _defaultBoard = new Board("Untitled Board", 'b0', {'theme': null});
+            let _defaultBoard = new Board("Escritorio sin titulo", 'b0', {'theme': null});
             appData.boards.push(_defaultBoard);
             appData.currentBoard = 0;
         }
@@ -815,7 +815,7 @@ e_deleteButton.addEventListener('click', () => {
         listBoards();
         renderBoard(appData.boards[appData.currentBoard]);
 
-        createAlert(`Deleted board "${_boardName}"`)
+        createAlert(`Escritorio Eliminado "${_boardName}"`)
     });
 });
 

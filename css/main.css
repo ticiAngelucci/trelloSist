@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
  body{
     font-family: Arial, Helvetica, sans-serif;
-    background-color: #f6e6ce !important;
+    background-color: #add057 !important;
 }
 
 .sidebar{
@@ -144,7 +144,7 @@ body {
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: #233138;
+    background-color: #e2f5b8;
     overflow-x: hidden;
     transition: width 0.5s;
     padding-top: 4rem;
@@ -174,12 +174,11 @@ body {
     padding: 0.5rem;
     margin-inline: 1em;
     margin-bottom: 1rem;
-    border-radius: 0.5rem;
     box-shadow: 3px 3px var(--primary-color-light);
 }
 
 .sidenav > ul > li.is-active {
-    box-shadow: 3px 3px yellow;
+    box-shadow: 3px 3px #009665;
 }
 
 .sidenav > ul > li.is-active:hover {
@@ -203,7 +202,7 @@ body {
 }
 
 .container {
-    width: min(99%, 90.5rem);
+    width: 80%;
     margin-inline: auto;
     overflow-x: auto;
     min-height: 85%;
@@ -301,8 +300,7 @@ body {
     font-weight: 600;
 
     background-color: rgba(14, 14, 14, 0.15);
-    padding-inline: 1rem;
-    border-radius: 1rem;
+    padding-inline: 18rem;
 }
 
 input[type="text"] {
@@ -333,8 +331,8 @@ input[type="text"]:focus {
     border: none;
     font-size: 1rem;
     border-radius: 1rem;
-    background-color: var(--primary-color);
-    color: black;
+    background-color: #00bca3;
+    color: white;
     padding: 0.5em 1em;
     box-shadow: 0px 2px var(--primary-color-light);
     margin-bottom: 2rem;
@@ -342,13 +340,13 @@ input[type="text"]:focus {
 
 #add-board-button:hover {
     cursor: pointer;
-    color: white;
+    color: black;
     box-shadow: 0px 2px white;
 }
 
 #add-board-text {
-    width:100%;
-    color:white;
+    width:80%;
+    color:black;
 }
 
 .plus-button {

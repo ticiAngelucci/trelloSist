@@ -20,7 +20,7 @@
 <body>
     <br>
     <center>
-        <img src="assets/logoTelo.png" alt="logoTelo" width="228px">
+        <img src="assets/logoMyNote.png" alt="logoMyNote" width="228px">
         <div class="container mt-5">
             <h2>Inicio de Sesión</h2>
 

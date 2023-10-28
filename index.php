@@ -12,8 +12,6 @@ if (!isset($_SESSION['username'])) {
 
 <head>
     <meta charset="UTF-8">
-    <link rel="mynote-icon" sizes="180x180" href="assets/pencil.ico">
-    <link rel="shortcut icon" href="assets/pencil.ico">
     <title>MyNote®</title>
 
     <link rel="stylesheet" href="css/main.css">
@@ -34,8 +32,9 @@ if (!isset($_SESSION['username'])) {
                     }
                     ?>
                 </p>
-                <i title="Delete this board." id="delete-button" class="fa fa-trash"></i>
-                <i title="Save all boards." id "save-button" class="fa fa-floppy-o"></i>
+                <i title="Eliminar tablero." id="delete-button" class="fa fa-trash"></i>
+                <i title="Guardar tablero." id "save-button" class="fa fa-floppy-o"></i>
+                <a href="functions/logout.php"><i title="Cerrar sesión" id="logout-button" class="fa fa-sign-out"></i></a>
             </span>
         </div>
     </header>

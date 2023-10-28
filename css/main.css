@@ -151,8 +151,8 @@ body {
 }
 
 .sidenav p.is-title {
-    font-size: 1.5rem;
-    color: #818181;
+    font-size: 2.0rem;
+    color: #ffffff;
     display: block;
     transition: 0.3s;
     text-align: center;
@@ -296,11 +296,11 @@ body {
 }
 
 #title {
-    color: white;
+    color: rgb(0, 0, 0);
     margin: 0;
-    font-weight: 600;
+    font-weight: 400;
 
-    background-color: rgba(14, 14, 14, 0.15);
+    background-color: rgba(0, 0, 0, 0.15);
     padding-inline: 1rem;
     border-radius: 1rem;
 }

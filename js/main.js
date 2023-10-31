@@ -20,9 +20,7 @@ const e_boardsList = document.getElementById('boards-list');
 const e_addBoardText = document.getElementById('add-board-text');
 const e_addBoardButton = document.getElementById('add-board-button');
 
-const e_autoSaveButton = document.getElementById('auto-save');
 const e_saveButton = document.getElementById('save-button');
-const e_settingsButton = document.getElementById('settings-button');
 const e_deleteButton = document.getElementById('delete-button');
 
 const e_cardContextMenu = document.getElementById('card-context-menu');
@@ -784,15 +782,6 @@ e_addBoardText.addEventListener('keyup', (e) => {
 
 e_addBoardButton.addEventListener('click', addBoard);
 
-e_autoSaveButton.addEventListener('change',  function (event) {
-    if (this.checked) {
-        autoSaveInternalId = setInterval(function (){
-            saveData();
-        }, 5000);
-    } else {
-        window.clearInterval(autoSaveInternalId);
-    }
-})
 //e_saveButton.addEventListener('click', saveData);
 e_saveButton.addEventListener('click', () => {saveData(); createAlert("Datos guardados exitosamente")});
 
@@ -835,7 +824,7 @@ function toggleSidebar() {
         document.removeEventListener('click', listenClickOutside);
     } else {
         e_sidebar.dataset.toggled = '';
-        e_sidebar.style.width = "250px";
+        e_sidebar.style.width = "290px";
         e_sidebar.style.boxShadow = "100px 100px 0 100vw rgb(0 0 0 / 50%)";
         // Listen click outside of sidebar
         setTimeout(() => {

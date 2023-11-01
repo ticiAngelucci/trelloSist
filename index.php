@@ -46,7 +46,7 @@ if (!isset($_SESSION['username'])) {
         <span id="sidebar-close">&times;</span>
         <p class="is-title">Escritorios</p>
         <ul id="boards-list">
-            <!-- Boards will be listed here... -->
+            <!--Aqui se mostraran los escritorios... -->
         </ul>
 
         <div class="flex-col">
@@ -56,7 +56,7 @@ if (!isset($_SESSION['username'])) {
     </div>
 
     <div id="card-context-menu" class="context-menu">
-        <!-- Right-click context menu on cards. -->
+        <!-- Click derecho en las opciones de tabla -->
         <ul>
             <li id="card-context-menu-delete">Eliminar</li>
             <li id="card-context-menu-clear">Vaciar</li>
@@ -75,7 +75,7 @@ if (!isset($_SESSION['username'])) {
 
     <div id="alert-container">
         <div id="alerts">
-            <!-- alerts go here -->
+            <!-- Alertas -->
         </div>
     </div>
 

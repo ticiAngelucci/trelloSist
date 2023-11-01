@@ -1,11 +1,5 @@
-"use strict";
 
-console.log("╦╔═┌─┐┬─┐┌┬┐┌─┐");
-console.log("╠╩╗├─┤├┬┘ ││└─┐");
-console.log("╩ ╩┴ ┴┴└──┴┘└─┘");
-console.log("Alan | V1.5 2021")
-
-/* <=================================== Elements / Variables ===================================> */
+/* Variablñes */
 const e_mainContainer = document.getElementById('main-container');
 const e_cardsContainer = document.getElementById('cards-container');
 
@@ -31,62 +25,79 @@ const e_cardContextMenuDuplicate = document.getElementById('card-context-menu-du
 const e_alerts = document.getElementById('alerts');
 
 const e_title = document.getElementById('title');
+//Aca pasamos a "agarrar" osea llamamos elementos del html con su respectivo id..
+//tambien se puede hacer con class pero nosotros lo hacemos con id
 
 // Auto save enabled as default
 let autoSaveInternalId = setInterval(function (){
     saveData();
 }, 5000);
+//En esta funcion estariamos seteando un intervalo de 5000(5 segundos)
+//en el cual cada 5seg va a ejecutar la funcion de guardar datos
 
 var appData = {
     'boards': [],
     'settings': {
         'userName': "User",
-        //[not yet] 'defaultTheme': "blue",
         'dataPersistence': true
     },
     'currentBoard': 0,  // The index of the currently open board.
     'identifier': 0
 };
+//Aca creamos un arreglo donde vamos guardando informacion de la app 
 
+
+/* Extensiones o metodos donde tocamos el array */
+Array.prototype.move = function(from, to) {
+    this.splice(to, 0, this.splice(from, 1)[0]);
+};
+//Esta extension permite mover un elemento de una matriz a una posición específica en la misma matriz. 
+//Los argumentos *from* y *to* representan los índices de los elementos que deseas mover. 
+//this.splice(from, 1)[0]: 
+//1)Esto elimina el elemento en la posición *from* de la matriz original y retorna ese elemento. 
+//2)El [0] al final se utiliza para acceder al primer (y en este caso, único) elemento del array resultante de splice.
+//3)Luego, this.splice(to, 0, ...) inserta el elemento previamente eliminado en la posición *to* sin eliminar ningún 
+//elemento en esa posición. Asique el elemento se ha movido de la posición *from* a la posición *to* en la matriz.
+
+Array.prototype.insert = function(index, item) {
+    this.splice( index, 0, item );
+};
+//Esta extension permite insertar un elemento en una posición específica de la matriz. 
+//Los argumentos *index* e *item* representan el índice en el que queres insertar el elemento y el elemento que queres insertar. 
+//1)this.splice(index, 0, item) inserta item en la posición index de la matriz sin eliminar ningún elemento en esa posición.
+
+/* Funciones */
 function currentCards() {
     return appData.boards[appData.currentBoard].cards;
 }
+//funcion donde  obtenemos las tarjetas del tablero actual
 
 function currentBoard() {
     return appData.boards[appData.currentBoard];
 }
+//lo mismo q la funcion de arriba solo q con tableros:)
 
-/* <=================================== Extensions ===================================> */
-Array.prototype.move = function(from, to) {
-    /* Move an item from the array to a specific index of the array. */
-
-    this.splice(to, 0, this.splice(from, 1)[0]);
-};
-
-Array.prototype.insert = function(index, item) {
-    /* Insert an item to a specific index of the array. */
-
-    this.splice( index, 0, item );
-};
-
-/* <=================================== Utility Functions ===================================> */
 function uniqueID() {
     appData.identifier += 1;
     return 'b' + appData.identifier;
 }
+//funcion q usamos para generar id únicos para tableros o elementos sumamos un +1 a appData.identifier en 1 
+//y tenemos un id que comienza con la letra 'b' + el +1 anterior
 
 function getMouseOverCard() {
-    // The card the mouse cursor is currently over.
     return document.querySelectorAll('.parent-card:hover')[0];
 }
+//funcion q intenta encontrar la card sobre la cual el cursor del mouse se encuentra en ese momento(lo pasamos como parametro con el querySelectorAll).
+// devuelve el primer elemento encontrado
 
 function getMouseOverItem() {
-    // The task the mouse cursor is currently over.
     return document.querySelectorAll('.parent-card > ul > li:hover')[0];
 }
+//funcion q intenta encontrar la tarea sobre la cual el cursor del mouse se encuentra en ese momento(lo pasamos como parametro con el querySelectorAll).
+// .parent-card > ul > li:hover para buscar elementos que sean elementos de lista (<li>) que estén dentro de elementos con clase parent-card.
+// devuelve el primer elemento encontrado
 
 function getItemFromElement(element) {
-    /* Get an Item object from a list item element. */
 
     for (let _card of currentCards()) {
         for (let _item of _card.items) {
@@ -96,21 +107,23 @@ function getItemFromElement(element) {
         }
     }
 }
+// funcion toma un elemento HTML como argumento y busca un objeto que corresponda a ese elemento en la estructura de datos de la aplicación. 
+//Busca el elemento en las tarjetas y tareas existentes y retorna el objeto que coincide con el id del elemento.
 
 function getCardFromElement(element) {
-    /* Get a Card object from a card div element. */
 
     return currentCards().find(e => e.id === element.id);
 }
+// similar a la funcion de arriba, pero esta vez busca un objeto de tarjeta a partir de un elemento HTML de tarjeta.
 
 function getBoardFromId(id) {
-    /* Get a board object from its unique id. */
+    
 
     return appData.boards.find(_b => _b.id === id);
 }
+//funcion q busca un objeto de tablero a partir de su id en la estructura de datos de la aplicación.
 
 function listBoards() {
-    /* List all the boards in the sidebar. */
 
     e_boardsList.innerHTML = '';
     for (let _board of appData.boards) {
@@ -125,103 +138,107 @@ function listBoards() {
         e_boardsList.appendChild(_boardTitle);
     }
 }
+//funcion se utiliza para mostrar una lista de todos los tableros en la barra lateral. 
+//limpia el contenido del elemento e_boardsList y luego recorre la lista de tableros en appData.boards, crea elementos de lista (<li>) 
+//para cada tablero, asigna clases y eventos, y los agrega al elemento e_boardsList.
 
 function renderBoard(board) {
     appData.currentBoard = appData.boards.indexOf(board);
     document.title = 'MyNote® | ' + currentBoard().name;
     e_title.innerText = currentBoard().name;
-    //e_title.addEventListener('click'), allow editing board name
-    // To-Do: set theme
     renderAllCards();
 }
+//funcion q cambia el tablero actual en la aplicación al tablero especificado y actualiza la interfaz de usuario para reflejar el nuevo tablero. 
+//También establece el título del documento en función del nombre del tablero.
 
 function renderAllCards() {
-    /* Refreshes the whole cards container. */
-
+   //refresh
     for (let _card of e_cardsContainer.querySelectorAll('.parent-card')) {
-
-        // Remove all the cards from the cards container.
+      //elimina carta
         _card.remove();
     }
 
     for (let _card of currentCards()) {
-        // Regenerate each card.
+        // Vuelve a generar la card.
         let _generated = _card.generateElement();
-        // Put them in the container right before the last child (text box for new card).
+        // Inserta este nuevo elemento de tarjeta en el e_cardsContainer justo antes del último hijo del contenedor. 
+        //Esto asegura que las tarjetas se coloquen  en el orden adecuado.
         e_cardsContainer.insertBefore(_generated, e_cardsContainer.childNodes[e_cardsContainer.childNodes.length - 2]);
-        // Update the card for event listeners and etc...
+        //Actauliza
         _card.update();
     }
 }
+//Esta función actualiza el contenedor de tarjetas eliminando todas las tarjetas existentes 
+//y luego generando y agregando de nuevo todas las tarjetas del tablero actual.
 
 function renderCard(cardID) {
     let _card = currentCards().find(e => e.id === cardID);
 
     if (!_card) {
-        // If card no longer exists in data. (ie: deleted but still rendered in DOM)
-        // Remove it from the DOM
+        // si no existe lo eliminamos
         let _currentCardElement = document.getElementById(cardID);
         _currentCardElement.parentNode.removeChild(_currentCardElement);
         return;
     }
 
-    // Get current card element if it exists.
+    // se genera.
     let _currentCardElement = document.getElementById(_card.id);
     if (_currentCardElement != null) {
         let _generated = _card.generateElement();
-        // Replace the card from the container.
+        // reemplaza la carta del container.
         _currentCardElement.parentNode.replaceChild(_generated, _currentCardElement);
     } else {
         let _generated = _card.generateElement();
-        // Put them in the container right before the last child (text box for new card).
+        // y la pone en orden.
         e_cardsContainer.insertBefore(_generated, e_cardsContainer.childNodes[e_cardsContainer.childNodes.length - 2]);
     }
 
-    // Update the event listeners.
+    // actualiza
     _card.update();
 }
+//funcion q actualiza una tarjeta específica en la interfaz respecto su identificador. 
+//Si la tarjeta ya no existe en los datos, se elimina de la interfaz de usuario. Si existe, se genera y reemplaza en el contenedor de tarjetas.
 
 function toggleHoverStyle(show) {
-    /* Sets whether hovering over cards/items changes their colors or not. */
 
     if (show) {
 
-        // Create a new style element.
+        //creamos un nuevo style
         let _hoverStyle = document.createElement('style');
         _hoverStyle.id = "dragHover";
 
-        // Card and item should turn slightly darker when move over.
-        // This gives a visual feedback that makes it easier for the user to know positions during drag and drop.
         _hoverStyle.innerHTML = ".parent-card:hover {background-color: #c7cbd1;}.parent-card > ul > li:hover {background-color: #d1d1d1;}";
         document.body.appendChild(_hoverStyle);
     } else {
 
-        // Get rid of the style element.
-        // This effectively prevents the elements from turning darker on hover.
         let _hoverStyle = document.getElementById('dragHover');
         _hoverStyle.parentNode.removeChild(_hoverStyle);
     }
 }
+//funcion q permite habilitar o deshabilitar un estilo de resaltado cuando el cursor del mouse pasa sobre tarjetas y tareas.
+// Agrega o elimina dinámicamente un estilo CSS para que los elementos se vean más oscuros cuando se pasa el mouse sobre ellos.
 
 function addBoard() {
-    /* Adds a new board based on the input in the sidebar. */
 
     let _boardTitle = e_addBoardText.value;
-    if (!_boardTitle) return createAlert("Escribe un nombre para el escritorio!");  // We don't create a board if it has no name.
-    if (appData.boards.length >= 512) return createAlert("Limite de escritorios excedido")  // or if there are already too many boards
+    if (!_boardTitle) return createAlert("Escribe un nombre para el escritorio!");  // No creamos si no tiene nombre
+    if (appData.boards.length >= 512) return createAlert("Limite de escritorios excedido")  // Si supera el numero 512 de tablas
     e_addBoardText.value = '';
 
     let _newBoard = new Board(_boardTitle, uniqueID(), {'theme': null});
     appData.boards.push(_newBoard);
     listBoards();
 }
+//funcion q agrega un nuevo tablero a la aplicación en función del titulo proporcionado en el value en la barra lateral.
+// Verifica si el nombre no está vacío y si no se ha alcanzado el límite de tableros , y 
+//luego crea un nuevo tablero, lo agrega a appData.boards y actualiza la lista de tableros en la interfaz de usuario.
 
-/* <=================================== Classes ===================================> */
+/* Clases */
 class Item {
 
     constructor(title, description=null, id, parentCardId) {
         this.title = title;
-        this.description = description;  // A field for a future version, perhaps v2
+        this.description = description;  
         this.id = id;
         this.isDone = false;
         this.parentCardId = parentCardId;
@@ -234,13 +251,9 @@ class Item {
     check(chk=true) {
         this.isDone = chk;
         if (chk) {
-
-            // Strikethrough the text if clicked on.
-            // NOTE02: Might remove this feature as its not really needed.
             document.getElementById(this.id).style.textDecoration = 'line-through';
         } else {
 
-            // Remove the strikethrough from the text.
             document.getElementById(this.id).style.textDecoration = 'none';
         }
     }
@@ -260,6 +273,10 @@ class Item {
         this.check(this.isDone);
     }
 }
+//Esta clase la usamos para representar elementos individuales (tareas) que se pueden agregar a una tarjeta en un tablero.
+//funcion check(chk=true) se utiliza para marcar o desmarcar la tarea como completada. También aplica un estilo de tachado al 
+//texto de la tarea cuando se marca como completada.
+//funcion update() agrega escuchas de eventos, como hacer clic en una tarea para marcarla como completada o deshacer la marca.
 
 class Card {
 
@@ -293,21 +310,20 @@ class Card {
             let _newItem = document.createElement('li');
             _newItem.id = _item.id;
             
-            // Item Title
+            // titulo
             let _newItemTitle = document.createElement('p');
             _newItemTitle.innerText = _item.title;
             _newItemTitle.classList.add('item-title', 'text-fix', 'unselectable');
             
-            // Housing for the edit and delete buttons.
             let _newItemButtons = document.createElement('span');
 
-            // Edit button. Allows the user to rename the item.
+            // Editar boton 
             let _newItemEditButton = document.createElement('i');
             _newItemEditButton.ariaHidden = true;
             _newItemEditButton.classList.add('fa', 'fa-pencil');
             _newItemEditButton.addEventListener('click', () => {
                 
-                // Card item editing functionality.
+                // editar contenido de tarjeta
                 let _input = document.createElement('textarea');
                 _input.value = _newItemTitle.textContent;
                 _input.classList.add('item-title');
@@ -325,7 +341,7 @@ class Card {
                 _input.focus();
             });
 
-            // Delete button. ALlows the user to delete the item from the card.
+            // borrar boton
             let _newItemDeleteButton = document.createElement('i');
             _newItemDeleteButton.ariaHidden = true;
             _newItemDeleteButton.classList.add('fa', 'fa-trash');
@@ -333,11 +349,11 @@ class Card {
                 createConfirmDialog("Quieres borrar esta tarea?", () => this.removeItem(_item));
             });
 
-            // Add both the buttons to the span tag.
+            // añadir botones
             _newItemButtons.appendChild(_newItemEditButton);
             _newItemButtons.appendChild(_newItemDeleteButton);
 
-            // Add the title, span tag to the item and the item itself to the list.
+            // añadir
             _newItem.appendChild(_newItemTitle);
             _newItem.appendChild(_newItemButtons);
             _newItemList.appendChild(_newItem);
@@ -348,34 +364,12 @@ class Card {
 
     generateElement() {
 
-        /* The structure of the card element. */
-
-        //  <div class="parent-card">
-        //    <span>
-        //        <h2>
-        //            {this.name}
-        //        </h2>
-        //        <i class="fa fa-bars" aria-hidden="true"></i>
-        //    </span>
-        //    <ul>
-        //        <li><p>{this.items[0]}</p> <span></span>
-        //        {more_items...}
-        //    </ul>  
-        //  </div>
-
-        // This was somewhat of a bad idea...
-        // Editing the style of the cards or items are made quite difficult.
-        // I should've wrote all this as HTML and put it in the .innerHTML
-        // But this gives me more flexibility, so I had to make a choice.
-
         let _newCardHeader = document.createElement('span');
         let _newCardHeaderTitle = document.createElement('h2');
         _newCardHeaderTitle.id = this.id + '-h2';
         _newCardHeaderTitle.innerText = this.name;
         _newCardHeaderTitle.classList.add('text-fix', 'card-title');
 
-        // A better, more flexible alternative to contentEditable.
-        // We replace the text element with an input element.
         _newCardHeaderTitle.addEventListener('click', (e) => {
             let _input = document.createElement('input');
             _input.value = _newCardHeaderTitle.textContent;
@@ -394,8 +388,7 @@ class Card {
             _input.focus();
         });
 
-        // Hamburger menu icon next to card title to enter card's context menu.
-        // *Feature not complete yet.*
+    
         let _newCardHeaderMenu = document.createElement('i');
         _newCardHeaderMenu.ariaHidden = true;
         _newCardHeaderMenu.classList.add("fa", "fa-bars");
@@ -403,7 +396,6 @@ class Card {
         _newCardHeader.append(_newCardHeaderMenu);
         _newCardHeaderMenu.addEventListener('click', cardContextMenu_show);
 
-        // Input area for typing in the name of new tasks for the card.
         let _newInput = document.createElement('input');
         _newInput.id = this.id + '-input';
         _newInput.maxLength = 256;
@@ -414,7 +406,7 @@ class Card {
             if (e.code === "Enter") _newButton.click();
         });
 
-        // Button next to input to convert the text from the _newInput into an actual item in the card.
+        
         let _newButton = document.createElement('button');
         _newButton.id = this.id + '-button';
         _newButton.classList.add("plus-button");
@@ -425,7 +417,7 @@ class Card {
             let _item = new Item(_inputValue, null, getBoardFromId(this.parentBoardId).uniqueID(), this.id);
             this.addItem(_item);
             _newInput.value = '';
-            _newInput.focus(); // wont because the card is being re-rendered
+            _newInput.focus(); 
         });
 
         let _newCard = document.createElement('div');
@@ -434,22 +426,25 @@ class Card {
         _newCard.appendChild(_newCardHeader);
 
         if (this.items) {
-            // If the card has items in it.
-
-            // Render the items of the card.
+            
+            // si tiene items renderiza
             let _newItemList = this.renderItems();
 
-            // Add the list to the card.
+            //añade a lista
             _newCard.appendChild(_newItemList);
         }
 
-        // Add the input and button to add new item at the end.
+        // añade botones.
         _newCard.appendChild(_newInput);
         _newCard.appendChild(_newButton);
 
         return _newCard;
     }
 }
+//Esta clase la usamos para representar tarjetas (o listas) que contienen tareas.
+//Card tiene métodos para agregar y eliminar tareas (addItem y removeItem) y para actualizar las tareas y la interfaz de usuario (update y renderItems).
+//La función generateElement() crea un elemento HTML que representa la tarjeta, incluyendo su nombre, tareas, 
+//y botones para editar y eliminar elementos. También proporciona funcionalidad para editar el nombre de la tarjeta haciendo clic en él.
 
 class Board {
 
@@ -457,8 +452,8 @@ class Board {
         this.name = name;
         this.id = id;
         this.settings = settings;
-        this.cards = [];  // All the cards that are currently in the container as Card objects.
-        this.identifier = identifier === null ? Date.now() : identifier;  // All elements within this board will carry an unqiue id.
+        this.cards = [];  
+        this.identifier = identifier === null ? Date.now() : identifier;  
     }
 
     uniqueID() {
@@ -470,7 +465,7 @@ class Board {
         let _cardTitle = e_addCardText.value;
         e_addCardText.value = '';
     
-        // If the user pressed the button without typing any name, we'll default to "Untitled Card {cards length +1}"
+        // si no ingresa titulo se pone "Tabla sin titulo *numero q pertenece*"
         if (!_cardTitle) _cardTitle = `Tabla sin titulo ${this.cards.length + 1}`;
     
         let _card = new Card(_cardTitle, this.uniqueID(), this.id);
@@ -480,74 +475,73 @@ class Board {
         e_cardsContainer.insertBefore(_newCard, e_cardsContainer.childNodes[e_cardsContainer.childNodes.length - 2]);
     }
 }
+//Esta clase la usamos para representar tableros que contienen tarjetas.
+//Board tiene métodos para agregar tarjetas (addCard) y para generar identificadores únicos para elementos dentro del tablero (uniqueID).
+//funcion addCard agrega una nueva tarjeta al tablero y la representa en la interfaz de usuario.
 
-/* <=================================== Items Drag n' Drop ===================================> */
-var cardDrag_mouseDown = false;  // Whether the user has clicked down on a card item.
-var cardDrag_mouseDownOn = null;  // The card item that is being held.
+/*  Drag n' Drop  */
+var cardDrag_mouseDown = false;  
+var cardDrag_mouseDownOn = null;  
 
 const cardDrag_update = (e) => {
 
-    // Only update if the mouse is held down, and on an item element.
     if (!cardDrag_mouseDown && !cardDrag_mouseDownOn) return;
 
-    // The card must be at the same coordinates as the mouse cursor.
-    // This simulates the effect of the card being grabbed by the cursor.
+    // La tarjeta debe estar en las mismas coordenadas que el cursor del mouse.
+    // Esto simula el efecto de que la tarjeta sea agarrada por el cursor.
     cardDrag_mouseDownOn.style.left = e.pageX + 'px';
     cardDrag_mouseDownOn.style.top = e.pageY + 'px';
 };
+//Las variables cardDrag_mouseDown y cardDrag_mouseDownOn se usan para rastrear si el usuario ha hecho clic en una tarea o elemento de tarjeta y 
+//cuál es el elemento en el que hizo clic.
+//funcion cardDrag_update actualiza la posición de un elemento que está siendo arrastrado para que siga el cursor del mouse.
 
 const cardDrag_startDragging = (e) => {
 
-    // Only grab elements that are list items.
-    // Otherwise we'll be able to individually grab child elements of the list item.
-    // Which is quite funny but it breaks the code so, nah.
+    // Solo seleccionar elementos que son elementos de lista.
     if (e.target.tagName !== 'LI') return;
 
     cardDrag_mouseDown = true;
     cardDrag_mouseDownOn = e.target;
 
-    // Set the position of the item to absolute
-    // This allows us to take the element out of the document flow and play with its coordinates.
+   // Establecer la posición del elemento en 'absolute'
+    // Esto nos permite sacar el elemento del flujo del documento y jugar con sus coordenadas.
     cardDrag_mouseDownOn.style.position = 'absolute';
 
-    // Enable hover style css, which makes other cards and items darker when hovered over.
+    // Habilitar el estilo de 'hover', que oscurece otras tarjetas y elementos cuando se pasa el mouse sobre ellos.
     toggleHoverStyle(true);
 };
 
 const cardDrag_stopDragging = (e) => {
 
-    // Only run the stop dragging code if the mouse was previously held down on an item element.
+   // Solo ejecutar el código de detener el arrastre si previamente el mouse estaba presionado en un elemento de lista.
     if (!cardDrag_mouseDown) return;
 
-    // Disable hover style css, which prevents cards and items from getting darker when hovered over.
+    // Deshabilitar el estilo de "hover" que evita que las tarjetas y elementos se oscurezcan al pasar el mouse sobre ellos.
     toggleHoverStyle(false);
 
     let _hoverCard = getMouseOverCard();
     if (_hoverCard) {
         let _hoverItem = getMouseOverItem();
 
-        // Get the object from the card element the mouse is over.
+         // Obtener el objeto del elemento de la tarjeta sobre el cual está el mouse.
         let _hoverCardObject = getCardFromElement(_hoverCard);
-        // Get the object from the item element the mouse is holding.
+        // Obtener el objeto del elemento de la tarjeta que se está sosteniendo con el mouse.
         let _heldItemObject = getItemFromElement(cardDrag_mouseDownOn);
         
         if (_hoverCard === _heldItemObject.getParentCard()) {
-            // If the card the mouse is over is the same as the parent card of the item being held.
-            // We only have to deal with vertical drag and drop.
-            // Ie: The user is only changing the order of items around.
+            // Si la tarjeta sobre la que está el mouse es la misma que la tarjeta principal del elemento que se está sosteniendo con el mouse.
+        // Solo tenemos que lidiar con el arrastre vertical.
+        // Es decir, el usuario está cambiando el orden de los elementos.
 
             if (_hoverItem) {
-                // If an item is being hovered over.
+                // Si se está pasando el mouse sobre un elemento.
 
                 if (_hoverItem !== cardDrag_mouseDownOn) {
-                    // As long as the mouse isn't over the item being dragged.
-                    // NOTE01: 
-                    // This check is in place because there is a chance that the '_hoverItem' ends up being the item being held.
-                    // This hasn't actually happened to me yet but I've sort of emulated it, so I know that it could happen under certain circumstances.
-                    // I haven't around to fixing this yet primarily because it is extremely rare, and doesn't affect the functioning of the app.
+                     // Mientras el mouse no esté sobre el elemento que se está arrastrando.
                     let _hoverItemObject = getItemFromElement(_hoverItem);
-                    // Move the position of the held item to the position of whichever item was hovered over.
-                    // This will push the item that was hovered over down, with the item that was being held taking its place.
+                    // Mueve la posición del elemento sostenido a la posición del elemento sobre el cual se pasa el mouse.
+                // Esto empujará hacia abajo el elemento sobre el que se pasó el mouse, con el elemento sostenido ocupando su lugar.
                     _hoverCardObject.items.move(_hoverCardObject.items.indexOf(_heldItemObject), _hoverCardObject.items.indexOf(_hoverItemObject));
                 }
             }
@@ -555,79 +549,81 @@ const cardDrag_stopDragging = (e) => {
             renderCard(_heldItemObject.getParentCard().id);
 
         } else {
-            // If the card the mouse is over is not the same as the parent card of the item being held.
-            // The user also gets the the ability to displace an item from the different card.
-            // So we'll be dealing with both logic here, ie: Between cards and displacing item if hovered over one.
+            // Si la tarjeta sobre la que está el mouse no es la misma que la tarjeta principal del elemento que se está sosteniendo con el mouse.
+        // El usuario también tiene la capacidad de mover un elemento a otra tarjeta.
+        // Por lo tanto, aquí trataremos con ambas lógicas, es decir, entre tarjetas y mover elementos si se pasa el mouse sobre uno.
 
             if (_hoverItem) {
-                // If an item is being hovered over.
+               
 
                 if (_hoverItem !== cardDrag_mouseDownOn) {
-                    // As long as the mouse isn't over the item being dragged.
-                    // See "NOTE01" above for clarification.
+                    // Mientras el mouse no esté sobre el elemento que se está arrastrando.
 
                     let _hoverItemObject = getItemFromElement(_hoverItem);
 
-                    // Get the object of the parent card of the item being hovered over.
+                    // Obtener el objeto de la tarjeta principal del elemento sobre el cual se pasa el mouse.
                     let _hoverItemParentObject = getCardFromElement(_hoverItemObject.getParentCard());
 
-                    // Insert the held item into the position of the item that was being hovered over.
-                    // This will push the item being hovered over down, with the item being held taking its place.
+                   // Insertar el elemento sostenido en la posición del elemento sobre el cual se pasa el mouse.
+                // Esto empujará hacia abajo el elemento sobre el que se pasa el mouse, con el elemento sostenido ocupando su lugar.
                     _hoverItemParentObject.items.insert(_hoverItemParentObject.items.indexOf(_hoverItemObject), _heldItemObject);
 
-                    // Remove the held item from its original card.
+                     // Eliminar el elemento sostenido de su tarjeta original.
                     getCardFromElement(_heldItemObject.getParentCard()).removeItem(_heldItemObject);
-                    // Give the held item a new parent card id.
+                    // Asignar al elemento sostenido un nuevo ID de tarjeta principal.
                     _heldItemObject.parentCardId = _hoverItemParentObject.id;
                 }
             } else {
-                // If an item wasn't being hovered and instead just the card.
+                // Si no se está pasando el mouse sobre un elemento y, en cambio, se pasa el mouse directamente sobre la tarjeta.
 
-                // Directly push the item being held to the items list of the card being hovered.
+            // Empujar directamente el elemento sostenido a la lista de elementos de la tarjeta sobre la que se pasa el mouse.
                 _hoverCardObject.items.push(_heldItemObject);
 
-                // Remove the held item from its original card.
+                 // Eliminar el elemento sostenido de su tarjeta original.
                 getCardFromElement(_heldItemObject.getParentCard()).removeItem(_heldItemObject);
-                // Give the held item a new parent card id.
+                // Asignar al elemento sostenido un nuevo ID de tarjeta principal.
                 _heldItemObject.parentCardId = _hoverCardObject.id;
             }
 
             renderCard(_hoverCardObject.id);
             renderCard(_heldItemObject.getParentCard().id);
         }
-        // renderAllCards();
-        // renderCard(originCard);
-        // renderCard(targetCard);
     }
     cardDrag_mouseDown = false;
     cardDrag_mouseDownOn.style.position = 'static';
     cardDrag_mouseDownOn = null;
 };
+//funcion q se ejecuta cuando el usuario suelta el clic del mouse.Restablece las variables relacionadas 
+//con el arrastre y desactiva el estilo de hover.
 
-// Adding the event listeners.
-// NOTE03: It would be a better idea to make a single mouseMove/mouseLeave/mouseUp function
-// to handle both the drag scroll and card item dragging.
-// It'll save unnecessary processing + less event listeners. 
+//Arrastrar Elementos entre Tarjetas y Cambiar el Orden de las Tareas 
 e_mainContainer.addEventListener('mousemove', cardDrag_update);
+//cuando movemos tarjeta se verifica si esta en otra tarjeta o no
 e_mainContainer.addEventListener('mouseleave', cardDrag_stopDragging, false);
+//cuando dejamos tarjeta se verifica si esta en otra tarjeta o no
 window.addEventListener('mouseup', cardDrag_stopDragging, false);
+//se actualizan los obbjectos del dato
 
-/* <=================================== Drag Scrolling ===================================> */
-// This feature allows the user to hold and drag the main cards container to scroll instead of holding the scrollbar.
-// Inspired by Trello but its really handy.
+/*  Drag Scrolling  */
+//variables q usamos para rastrear el estado del desplazamiento por arrastre y la posición inicial.
+
 
 let scroll_mouseDown = false;
 let scroll_startX, scroll_scrollLeft;
 
+//funciones
 const scroll_startDragging = (e) => {
     scroll_mouseDown = true;
     scroll_startX = e.pageX - e_mainContainer.offsetLeft;
     scroll_scrollLeft = e_mainContainer.scrollLeft;
 };
+//funcion que ejecuta cuando el usuario hace clic en el contenedor principal de tarjetas para comenzar el desplazamiento por arrastre.
+//toma la posición inicial y la posición actual del desplazamiento.
 
 const scroll_stopDragging = (e) => {
     scroll_mouseDown = false;
 };
+//funcion que ejecuta cuando el usuario deja de hacer clic, lo que finaliza el desplazamiento por arrastre.
 
 const scroll_update = (e) => {
     e.preventDefault();
@@ -636,15 +632,23 @@ const scroll_update = (e) => {
     let _scroll = (e.pageX - e_mainContainer.offsetLeft) - scroll_startX;
     e_mainContainer.scrollLeft = scroll_scrollLeft - _scroll;
 };
+//funcion que actualiza la posición de desplazamiento mientras el usuario mueve el contenido del contenedor principal.
+//Asegura que el desplazamiento solo ocurra si el usuario ha iniciado un desplazamiento y no está arrastrando un elemento de tarea al mismo tiempo.
 
-// Add the event listeners
+// Eventos q escuchan en js
 e_mainContainer.addEventListener('mousemove', scroll_update);
+//Cuando el mouse se mueve sobre e_mainContainer, llamamos a función scroll_update. 
 e_mainContainer.addEventListener('mousedown', scroll_startDragging, false);
+//Cuando el mouse hace click sobre e_mainContainer, llamamos a función scroll_startDragging
 e_mainContainer.addEventListener('mouseup', scroll_stopDragging, false);
+//Cuando soltamos el mouse en e_mainContainer, llamamos a función scroll_stopDragging
 e_mainContainer.addEventListener('mouseleave', scroll_stopDragging, false);
+//Cuandoel mouse sale de la zona de e_mainContainer, llamamos a función scroll_stopDragging(ya que aplica para
+//detener proceso de arrastre tanto como para cuando saca el mouse de un elemento y cuando saca el mouse del area de la vista principal
+//ya q osino estaria todo el tiempo ejecutandose)
 
 
-/* <=================================== Card Context Menu ===================================> */
+/*  Menu de tarjetas  */
 
 
 let cardContextMenu_currentCard;
@@ -652,9 +656,6 @@ const cardContextMenu_show = (e) => {
 
     cardContextMenu_currentCard = getMouseOverCard();
 
-    // To-Do: Change the coords of the context menu to card button's exact coordinates.
-    // Use cardElement.getBoundingClientRect(); or something like that...
-    // Also, prevent the context menu from going out of bounds by normalizing the coordinates.
     const { clientX: mouseX, clientY: mouseY } = e;
     e_cardContextMenu.style.top = mouseY + 'px';
     e_cardContextMenu.style.left = mouseX + 'px';
@@ -665,13 +666,16 @@ const cardContextMenu_show = (e) => {
     });
 
 };
+//funcion q la usamos cuando se hace clic en una tarjeta. 
+//Muestra el menú contextual en las coordenadas donde se hizo clic en la tarjeta. Se asegura de que el menú contextual esté visible.
 
 const cardContextMenu_hide = (e) => {
-    // As long as the user isn't clicking on a context menu, we can hide it.
     if (e.target.offsetParent != e_cardContextMenu && e_cardContextMenu.classList.contains('visible')) {
         e_cardContextMenu.classList.remove("visible");
     }
 };
+// funcion q la usamos cuando se hace clic en cualquier parte del cuerpo del documento. 
+//Si el clic se realiza fuera del menú contextual y el menú contextual está visible, se oculta el menú contextual.
 
 const cardContextMenu_clearCard = () => {
     createConfirmDialog('Quieres vaciar esta tabla?', () => {
@@ -681,18 +685,21 @@ const cardContextMenu_clearCard = () => {
         renderCard(_currentCardObject.id);
     });
 };
+// funcion q la usamos cuando el usuario selecciona la opción "Vaciar tabla" en el menú contextual. Muestra un cuadro de diálogo de confirmación
+// para asegurarse de que el usuario quiere eliminar todos los elementos de la tarjeta. Si el usuario confirma, elimina todos los elementos de la tarjeta.
 
 const cardContextMenu_deleteCard = () => {
     createConfirmDialog('Deseas borrar esta tabla?', () => {
         let _currentCardObject = getCardFromElement(cardContextMenu_currentCard);
 
-        // Remove the card from the cards list based on its index position.
         currentCards().splice(currentCards().indexOf(_currentCardObject), 1);
         cardContextMenu_hide({target:{offsetParent:'n/a'}}); // this is really stupid but it works, LoL
 
         renderCard(_currentCardObject.id);
     });
 }
+//funcion q la usamos cuando el usuario selecciona la opción "Borrar tabla" en el menú contextual. Muestra un cuadro de diálogo 
+//de confirmación para asegurarse de que el usuario quiere eliminar la tarjeta completa. Si el usuario confirma, elimina la tarjeta.
 
 const cardContextMenu_duplicateCard = () => {
     let _currentCardObject = getCardFromElement(cardContextMenu_currentCard);
@@ -705,6 +712,8 @@ const cardContextMenu_duplicateCard = () => {
 
     renderCard(currentBoard().cards[_cIndex].id);
 }
+//funcion q la usamos cuando el usuario selecciona la opción "Duplicar tabla" en el menú contextual.
+// Crea una copia de la tarjeta actual, incluyendo todos sus elementos, y la agrega a la lista de tarjetas en el mismo tablero.
 
 
 document.body.addEventListener('click', cardContextMenu_hide);
@@ -712,84 +721,107 @@ e_cardContextMenuClear.addEventListener('click', cardContextMenu_clearCard);
 e_cardContextMenuDelete.addEventListener('click', cardContextMenu_deleteCard);
 e_cardContextMenuDuplicate.addEventListener('click', cardContextMenu_duplicateCard);
 
-/* <=================================== Persistent Data Storage ===================================> */
+/* Persistent Data Storage */
+//Es almacenamiento de datos de manera persistente, lo que significa que los datos se mantienen incluso después de que un programa se cierre o se reinicie.
+
 function saveData() {
-    window.localStorage.setItem('kards-appData', JSON.stringify(appData));
+    window.localStorage.setItem('myNote-appData', JSON.stringify(appData));
 }
+//funcuion q toma el objeto appData y lo almacena en el almacenamiento local del navegador como una cadena JSON.
+// Guarda los datos de la aplicación bajo la clave 'myNote-appData'.
 
 function getDataFromLocalStorage() {
-    return window.localStorage.getItem('kards-appData');
+    return window.localStorage.getItem('myNote-appData');
 }
+//funcion q recupera los datos de la aplicación almacenados en el localStorage y los devuelve como una cadena. 
+
 
 function loadData() {
-    let _data = window.localStorage.getItem('kards-appData');
+    let _data = window.localStorage.getItem('myNote-appData');
     if (_data) {
         let _appData = JSON.parse(_data);
 
-        // Since JSON doesn't store functions and such.
-        // We'll have to reinitailize the classes with the loaded data.
+        // Dado que JSON no almacena funciones y otros elementos, 
+        // tendremos que volver a inicializar las clases con los datos cargados.
         appData.settings = _appData.settings;
+        
+        // Establecer el tablero actual, si es válido. De lo contrario, establecerlo en cero.
         appData.currentBoard = _appData.currentBoard >= 0 ? appData.currentBoard : 0;
+        
+        // Establecer el identificador, si no es nulo. De lo contrario, mantener el valor actual.
         appData.identifier = _appData.identifier !== null ? appData.identifier : 0;
         
-        // Fill the data with boards.
+        // Llenar los datos con tableros.
         for (let _board of _appData.boards) {
             let _newBoard = new Board(_board.name, _board.id, _board.settings, _board.identifier);
 
-            // Fill the board with cards.
+            // Llenar el tablero con tarjetas.
             for (let _card of _board.cards) {
                 let _newCard = new Card(_card.name, _card.id, _board.id);
 
-                // Fill the cards with items.
+                // Llenar las tarjetas con elementos.
                 for (let _item of _card.items) {
                     let _newItem = new Item(_item.title, _item.description, _item.id, _card.id);
-                    // Push the item into the card.
+                    // Agregar el elemento a la tarjeta.
                     _newCard.items.push(_newItem);
                 }
-                // Push the card into the board.
+                // Agregar la tarjeta al tablero.
                 _newBoard.cards.push(_newCard);
             }
-            // Push the board into app data.
+            // Agregar el tablero a los datos de la aplicación.
             appData.boards.push(_newBoard);
         }
 
-        // Generate the board.
+        // Generar el tablero.
         renderBoard(appData.boards[appData.currentBoard]);
     } else {
+        // Si no se encuentra ningún dato en el almacenamiento local, establecer el tablero actual en cero.
         appData.currentBoard = 0;
+        // Crear un tablero predeterminado.
         let _defaultBoard = new Board("Escritorio sin titulo", 'b0', {'theme': null});
         appData.boards.push(_defaultBoard);
     }
+    // Listar los tableros disponibles.
     listBoards();
 }
+//funcion q se utiliza para cargar datos previamente guardados en el localStorage. 
+//1)verifica si existen datos en el almacenamiento local. Si existen, los datos se cargan y se utilizan para restaurar el estado de la aplicación.
+// Si no se encuentran datos, se crea un nuevo objeto appData con un "tablero" (board) predeterminado.
+
 
 function clearData() {
     window.localStorage.clear();
 }
+//funcion q limpia todo el almacenamiento local del navegador. Elimina todos los datos guardados bajo cualquier clave en localStorage. 
 
 loadData();
+//funcion q llama al cargar la página o la aplicación. Carga datos previamente guardados si están disponibles osino, inicializa la aplicación
+// con datos predeterminados.
 
-/* <=================================== Other Events ===================================> */
+/*  Eventos  */
 e_addCardText.addEventListener('keyup', (e) => {
     if (e.code === "Enter") currentBoard().addCard();
 });
+//Cuando el usuario presiona una tecla, se dispara este evento,añade tarjeta.
 
 e_addCardButton.addEventListener('click', () => currentBoard().addCard());
+//Cuando el usuario presiona un click, se dispara este evento,añade tarjeta.
 
 e_addBoardText.addEventListener('keyup', (e) => {
     if (e.code === "Enter") addBoard();
 });
-
+//Cuando el usuario presiona una tecla, se dispara este evento,añade tabla.
 e_addBoardButton.addEventListener('click', addBoard);
+//Cuando el usuario presiona un click, se dispara este evento,añade tabla.
 
-//e_saveButton.addEventListener('click', saveData);
 e_saveButton.addEventListener('click', () => {saveData(); createAlert("Datos guardados exitosamente")});
+//Cuando el usuario presiona un click, se dispara este evento,guarda info y muestra mensaje.
 
 e_deleteButton.addEventListener('click', () => {
     createConfirmDialog('Deseas borrar este escritorio?', () => {
         let _boardName = currentBoard().name;
-
-        // Delete the current board.
+        //Esta lógica elimina el tablero actual, ajusta el tablero actual si
+        // no era el primero y, si no quedan tableros, crea un nuevo tablero predeterminado llamado "Escritorio sin titulo."
         appData.boards.splice(appData.currentBoard, 1);
         if (appData.currentBoard !== 0) {
             appData.currentBoard--;
@@ -807,52 +839,65 @@ e_deleteButton.addEventListener('click', () => {
         createAlert(`Escritorio Eliminado "${_boardName}"`)
     });
 });
+//funcion para eliminar escritorio
 
 window.onbeforeunload = function () {
     if (JSON.stringify(appData) !== getDataFromLocalStorage()) {
         return confirm();
     }
 }
-/* <=================================== Sidebar ===================================> */
+//define una función anónima que se ejecuta cuando el usuario intenta cerrar la ventana o la pestaña del navegador.
+/*  Sidebar */
 function toggleSidebar() {
     if (('toggled' in e_sidebar.dataset)) {
         delete e_sidebar.dataset.toggled;
         e_sidebar.style.width = "0";
         e_sidebar.style.boxShadow = "unset";
 
-        // Remove listen click outside of side
         document.removeEventListener('click', listenClickOutside);
     } else {
         e_sidebar.dataset.toggled = '';
-        e_sidebar.style.width = "290px";
+        e_sidebar.style.width = "250px";
         e_sidebar.style.boxShadow = "100px 100px 0 100vw rgb(0 0 0 / 50%)";
-        // Listen click outside of sidebar
         setTimeout(() => {
             document.addEventListener('click', listenClickOutside);
         }, 300);
     }
 }
+//funcion q permite alternar la visibilidad de la barra lateral. 
+//Si el atributo toggled está presente en el dataset de e_sidebar, significa que la barra lateral está visible.
+// En este caso, la función elimina el atributo toggled del dataset, establece el ancho de la barra lateral en cero y elimina cualquier sombra.
+//Si el atributo toggled no está presente, se agrega al dataset, y 
+//la barra lateral se expande a un ancho de 250px con una sombra para oscurecer el contenido principal.
+// Además, se agrega un evento para escuchar clics fuera de la barra lateral para poder cerrarla si el usuario hace clic en otro lugar.
 
 e_sidebarButton.addEventListener('click', toggleSidebar);
+//cuando se hace click se abre la barra lateral
 e_sidebarClose.addEventListener('click', toggleSidebar);
+//cuando se hace click se cierra la barra lateral
 
 /* Alerts */
 
 function createAlert(text) {
+    //crea un div y un p  para contener la aalerta dentro de el
     let _e = document.createElement('div');
     let _p = document.createElement('p');
     _p.innerText = text;
     _e.classList.add('alert');
+    //lo pone como hijo
     _e.appendChild(_p);
 
     e_alerts.appendChild(_e);
+    //agrega animacion con un lapso de tiempo
     setTimeout(function(){
         _e.classList.add('animate-hidden');
     }, 3500);
+    //agrega para eliminar pasado un lapso de tiempo
     setTimeout(function(){
         _e.parentNode.removeChild(_e);
     }, 4500);
 }
+//funcion q se utiliza para crear y mostrar una alerta en la interfaz de la aplicación
 
 function listenClickOutside(event) {
     const _withinBoundaries = event.composedPath().includes(e_sidebar);
@@ -860,10 +905,10 @@ function listenClickOutside(event) {
         toggleSidebar();
     }
 }
+//funcion q se utiliza para escuchar clics fuera del área de la barra lateral (e_sidebar) y cerrar la barra lateral si está abierta.
 
 function createConfirmDialog(text, onConfirm) {
-
-    // Hide any context menus that might be open.
+    //Oculta cualquier menú contextual que pueda estar abierto 
     cardContextMenu_hide({target:{offsetParent:'n/a'}});
 
     var _modal = document.getElementById("confirm-dialog");
@@ -894,3 +939,4 @@ function createConfirmDialog(text, onConfirm) {
         }
     }
 }
+//funcion q crea un cuadro de diálogo de confirmación en la interfaz de la aplicación
